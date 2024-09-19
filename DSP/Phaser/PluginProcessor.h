@@ -10,26 +10,27 @@
 
 #include <JuceHeader.h>
 #include "phaser.h"
+
 //==============================================================================
 /**
 */
-class FlangerAudioProcessor  : public juce::AudioProcessor
-                            #if JucePlugin_Enable_ARA
-                             , public juce::AudioProcessorARAExtension
-                            #endif
+class PhaserAudioProcessor  : public juce::AudioProcessor
+#if JucePlugin_Enable_ARA
+    , public juce::AudioProcessorARAExtension
+#endif
 {
 public:
     //==============================================================================
-    FlangerAudioProcessor();
-    ~FlangerAudioProcessor() override;
+    PhaserAudioProcessor();
+    ~PhaserAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
-   #ifndef JucePlugin_PreferredChannelConfigurations
+#ifndef JucePlugin_PreferredChannelConfigurations
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
-   #endif
+#endif
 
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
@@ -56,35 +57,30 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    // creating a Value Tree State object for controlling parameters.
+    // Creating a Value Tree State object for controlling parameters.
     juce::AudioProcessorValueTreeState apvts;
-    // creating 2 flanger objects for stereo-flanger
-    std::array<Flanger, 2> flangers;
 
-
+    // Phaser object to handle processing for both channels
+    Phaser phaserEffect;
 
 private:
-    // creating smoothed values for every parameter
-    juce::SmoothedValue<float> previousdryWet {0.0f};
-    juce::SmoothedValue<float>  previousfeedback {0.0f};
-    juce::SmoothedValue<float>  previousrateL {0.0f};
-    juce::SmoothedValue<float>  previousrateR {0.0f};
-    juce::SmoothedValue<float>  previousdepthL {0.0f};
-    juce::SmoothedValue<float>  previousdepthR {0.0f};
-    juce::SmoothedValue<float>  previousintensity{0.0f};
+    // Creating smoothed values for every parameter
+    juce::SmoothedValue<float> previousDryWet {0.0f};
+    juce::SmoothedValue<float> previousRate {0.0f};
+    juce::SmoothedValue<float> previousDepth {0.0f};
+    juce::SmoothedValue<float> previousIntensity {0.0f};
 
-    // the actual realtime atomic float values of parameters, init with nullpointer for protection
+    // The actual real-time atomic float values of parameters, initialized with null pointers for protection
     std::atomic<float>* dryWet = nullptr;
-    std::atomic<float>* feedback  = nullptr;
-    std::atomic<float>* rateL = nullptr;
-    std::atomic<float>*  rateR = nullptr;
-    std::atomic<float>*  depthL = nullptr;
-    std::atomic<float>* depthR  = nullptr;
-    std::atomic<float>* intensity  = nullptr;
+    std::atomic<float>* rate = nullptr;
+    std::atomic<float>* depth = nullptr;
+    std::atomic<float>* intensity = nullptr;
 
-    // mainvolume variabele
+    // Main volume variable
     float mainVolume = 0.8f;
 
+    // Function to create the parameter layout for the Value Tree State
     juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FlangerAudioProcessor)
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PhaserAudioProcessor)
 };

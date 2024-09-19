@@ -31,7 +31,8 @@ target_sources(PhaserPlugin
         PluginProcessor.cpp
         Phaser.cpp
         oscillator.cpp
-        circBuffer.cpp  # Keep this for now; consider removing later if not needed
+        circBuffer.cpp
+        effect.cpp# Keep this for now; consider removing later if not needed
         )
 
 # Compiler definitions (disable web browser and curl support for efficiency)

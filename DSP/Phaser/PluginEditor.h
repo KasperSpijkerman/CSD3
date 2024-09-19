@@ -11,77 +11,54 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "utilities.h"
+
 //==============================================================================
 /**
+*   The Phaser Audio Processor Editor class
 */
-
-// class with inheritance from OSCreceiver
-class FlangerAudioProcessorEditor  : public juce::AudioProcessorEditor,
-                                              public FlangerAudioProcessor,
-                                              private juce::OSCReceiver, // [1]
-                                              private juce::OSCReceiver::ListenerWithOSCAddress<juce::OSCReceiver::MessageLoopCallback> // [2]
+class PhaserAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
-
 public:
-    FlangerAudioProcessorEditor (FlangerAudioProcessor&,juce::AudioProcessorValueTreeState&);
-    ~FlangerAudioProcessorEditor() override;
+    PhaserAudioProcessorEditor (PhaserAudioProcessor&, juce::AudioProcessorValueTreeState&);
+    ~PhaserAudioProcessorEditor() override;
 
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
 
 private:
-
-    // value treestate for parameters.
+    // Reference to the value tree state for parameters.
     juce::AudioProcessorValueTreeState& valueTreeState;
-    // short
+
+    // Shortcut for Slider Attachment
     typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
-    //creating the sliders with labels for parameter control
-    // dry wet
+
+    // Creating the sliders with labels for parameter control
+    // Dry/Wet mix
     juce::Slider drywetSlider;
     juce::Label  drywetLabel;
     std::unique_ptr<SliderAttachment> drywetSliderAttachment;
-    // feedback
-    juce::Slider feedbackSlider;
-    juce::Label  feedbackLabel;
-    std::unique_ptr<SliderAttachment> feedbackSliderAttachment;
-    // rate L
-    juce::Slider rateLSlider;
-    juce::Label  rateLLabel;
-    std::unique_ptr<SliderAttachment> rateLSliderAttachment;
-    // rate R
-    juce::Slider rateRSlider;
-    juce::Label  rateRLabel;
-    std::unique_ptr<SliderAttachment> rateRSliderAttachment;
-    // depth L
-    juce::Slider depthLSlider;
-    juce::Label  depthLLabel;
-    std::unique_ptr<SliderAttachment> depthLSliderAttachment;
-    // depth R
-    juce::Slider depthRSlider;
-    juce::Label  depthRLabel;
-    std::unique_ptr<SliderAttachment> depthRSliderAttachment;
-    // intensity
+
+    // Rate (LFO speed)
+    juce::Slider rateSlider;
+    juce::Label  rateLabel;
+    std::unique_ptr<SliderAttachment> rateSliderAttachment;
+
+    // Intensity (modulation depth)
     juce::Slider intensitySlider;
     juce::Label  intensityLabel;
     std::unique_ptr<SliderAttachment> intensitySliderAttachment;
 
-    // osc receiver
-    juce::OSCReceiver oscReceiver;
+    // Depth (controls the depth of the modulation)
+    juce::Slider depthSlider;
+    juce::Label  depthLabel;
+    std::unique_ptr<SliderAttachment> depthSliderAttachment;
 
-    // utilities
+    // Reference to the processor
+    PhaserAudioProcessor& audioProcessor;
+
+    // Utility class (if still needed)
     Util util;
 
-    // compass counter, rotations
-    bool tippingpoint{false};
-    float compassRotations {0};
-    int rotationFactor{0};
-
-    // Functions OSC
-    void oscMessageReceived (const juce::OSCMessage& message) override;
-    void showConnectionErrorMessage (const juce::String& messageText);
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
-    FlangerAudioProcessor& audioProcessor;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FlangerAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PhaserAudioProcessorEditor)
 };
