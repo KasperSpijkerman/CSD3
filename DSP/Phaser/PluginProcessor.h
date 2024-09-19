@@ -9,7 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "flanger.h"
+#include "phaser.h"
 //==============================================================================
 /**
 */

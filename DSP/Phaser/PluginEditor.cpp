@@ -152,103 +152,103 @@ void FlangerAudioProcessorEditor::resized()
 }
 
 // Function for receiving OSC and getting the messages.
-void FlangerAudioProcessorEditor::oscMessageReceived (const juce::OSCMessage& message)
-{
-    if (message.size() == 1 && message[0].isFloat32())   {}
-    OSCAddressPattern compassPattern("/ZIGSIM/1234/compass");
-    OSCAddressPattern touch02Pattern("/ZIGSIM/1234/touch02");
-    OSCAddressPattern smilePattern("/ZIGSIM/1234/facemouthsmileleft");
-
-    OSCAddress messageAddress(message.getAddressPattern().toString());
-
-    if (compassPattern.matches(messageAddress))
-    {
-        // receiving compass with 360 and creating variabele for one full rotation
-        float compassOneRotation = util.mapInRange(message[0].getFloat32(),0,360,0,100.0f);
-        // degrees for feedback scaling it according to rotationfactor
-        float degreesFB = (message[0].getFloat32()+(rotationFactor * 360));
-        float degreesRate = (message[0].getFloat32()+(compassRotations * 360));
-        // scaling feedback according to 4 max rotations, making it more dynamic
-        float feedbackCOSC = util.mapInRange(degreesFB,1,1080,0,0.90);
-        // scaling feedback according to 6 max rotations, making it more dynamic
-        float rateOSC = util.mapInRange(degreesRate,1,1440,0,0.99);
-        feedbackSlider.setValue (juce::jlimit (0.0f, 0.90f,feedbackCOSC ));
-        rateLSlider.setValue(juce::jlimit (0.1f, 4.9f, rateOSC));
-        rateRSlider.setValue(juce::jlimit (0.0f, 5.0f, rateOSC));
-
-        if(compassOneRotation>95.0)
-        {
-            tippingpoint = true;
-        }
-
-        if(tippingpoint&&compassOneRotation < 3.0)
-        {
-            compassRotations++;
-            rotationFactor++;
-            tippingpoint = false;
-        }
-        if (compassRotations >4)
-        {
-            compassRotations = 0;
-        }
-
-        if (rotationFactor > 3)
-        {
-            rotationFactor = 0;
-        }
-
-
-
-    }
-    // comparing messages to touch02 (y coordinate) address and changing intensity slider
-    if (touch02Pattern.matches(messageAddress))
-    {
-        // intensity changing based on y coordinate
-        float yCoordinate = message[0].getFloat32();
-        float intensityOSC = util.mapInRange(yCoordinate,-1,1,20,1);
-
-        intensitySlider.setValue (juce::jlimit (0.0f, 20.0f, intensityOSC));
-    }
-
-    if (smilePattern.matches(messageAddress))
-    {
-        // toggle for smiling changing the dry wet
-        bool drywet = false;
-        bool currentState = false;
-        bool previousState = false;
-        bool smile = false;
-        float drywetOSC {0};
-
-        if(message[0].getFloat32() > 0.3)
-        {
-            smile = true;
-        }
-        else
-        {
-            smile = false;
-        }
-        currentState = smile;
-
-        if (previousState != currentState)
-        {
-            if (smile)
-            {
-                drywet = !drywet;
-            }
-            previousState = currentState;
-        }
-        if (drywet)
-        {
-            drywetOSC = 0.2;
-        }
-        else
-        {
-
-            drywetOSC = 0.8;
-        }
-        drywetSlider.setValue (juce::jlimit (0.0f, 20.0f,drywetOSC));
-    }
-}
+//void FlangerAudioProcessorEditor::oscMessageReceived (const juce::OSCMessage& message)
+//{
+//    if (message.size() == 1 && message[0].isFloat32())   {}
+//    OSCAddressPattern compassPattern("/ZIGSIM/1234/compass");
+//    OSCAddressPattern touch02Pattern("/ZIGSIM/1234/touch02");
+//    OSCAddressPattern smilePattern("/ZIGSIM/1234/facemouthsmileleft");
+//
+//    OSCAddress messageAddress(message.getAddressPattern().toString());
+//
+//    if (compassPattern.matches(messageAddress))
+//    {
+//        // receiving compass with 360 and creating variabele for one full rotation
+//        float compassOneRotation = util.mapInRange(message[0].getFloat32(),0,360,0,100.0f);
+//        // degrees for feedback scaling it according to rotationfactor
+//        float degreesFB = (message[0].getFloat32()+(rotationFactor * 360));
+//        float degreesRate = (message[0].getFloat32()+(compassRotations * 360));
+//        // scaling feedback according to 4 max rotations, making it more dynamic
+//        float feedbackCOSC = util.mapInRange(degreesFB,1,1080,0,0.90);
+//        // scaling feedback according to 6 max rotations, making it more dynamic
+//        float rateOSC = util.mapInRange(degreesRate,1,1440,0,0.99);
+//        feedbackSlider.setValue (juce::jlimit (0.0f, 0.90f,feedbackCOSC ));
+//        rateLSlider.setValue(juce::jlimit (0.1f, 4.9f, rateOSC));
+//        rateRSlider.setValue(juce::jlimit (0.0f, 5.0f, rateOSC));
+//
+//        if(compassOneRotation>95.0)
+//        {
+//            tippingpoint = true;
+//        }
+//
+//        if(tippingpoint&&compassOneRotation < 3.0)
+//        {
+//            compassRotations++;
+//            rotationFactor++;
+//            tippingpoint = false;
+//        }
+//        if (compassRotations >4)
+//        {
+//            compassRotations = 0;
+//        }
+//
+//        if (rotationFactor > 3)
+//        {
+//            rotationFactor = 0;
+//        }
+//
+//
+//
+//    }
+//    // comparing messages to touch02 (y coordinate) address and changing intensity slider
+//    if (touch02Pattern.matches(messageAddress))
+//    {
+//        // intensity changing based on y coordinate
+//        float yCoordinate = message[0].getFloat32();
+//        float intensityOSC = util.mapInRange(yCoordinate,-1,1,20,1);
+//
+//        intensitySlider.setValue (juce::jlimit (0.0f, 20.0f, intensityOSC));
+//    }
+//
+//    if (smilePattern.matches(messageAddress))
+//    {
+//        // toggle for smiling changing the dry wet
+//        bool drywet = false;
+//        bool currentState = false;
+//        bool previousState = false;
+//        bool smile = false;
+//        float drywetOSC {0};
+//
+//        if(message[0].getFloat32() > 0.3)
+//        {
+//            smile = true;
+//        }
+//        else
+//        {
+//            smile = false;
+//        }
+//        currentState = smile;
+//
+//        if (previousState != currentState)
+//        {
+//            if (smile)
+//            {
+//                drywet = !drywet;
+//            }
+//            previousState = currentState;
+//        }
+//        if (drywet)
+//        {
+//            drywetOSC = 0.2;
+//        }
+//        else
+//        {
+//
+//            drywetOSC = 0.8;
+//        }
+//        drywetSlider.setValue (juce::jlimit (0.0f, 20.0f,drywetOSC));
+//    }
+//}
 
 // debug OSC connection
 void FlangerAudioProcessorEditor::showConnectionErrorMessage (const juce::String& messageText)

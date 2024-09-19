@@ -1,4 +1,4 @@
-/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/ninja -G Ninja -S /Volumes/SSD_Kasper/HKU/Jaar_3/DSP/Phaser -B /Volumes/SSD_Kasper/HKU/Jaar_3/DSP/Phaser/cmake-build-debug
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/ninja -G Ninja -S /Volumes/SSD_Kasper/HKU/Jaar_3/CSD3/DSP/Phaser -B /Volumes/SSD_Kasper/HKU/Jaar_3/CSD3/DSP/Phaser/cmake-build-debug
 -- The C compiler identification is AppleClang 15.0.0.15000100
 -- The CXX compiler identification is AppleClang 15.0.0.15000100
 -- Detecting C compiler ABI info
@@ -16,5 +16,5 @@ CMake Error at CMakeLists.txt:40 (juce_add_plugin):
 
 
 -- Configuring incomplete, errors occurred!
-See also "/Volumes/SSD_Kasper/HKU/Jaar_3/DSP/Phaser/cmake-build-debug/CMakeFiles/CMakeOutput.log".
-See also "/Volumes/SSD_Kasper/HKU/Jaar_3/DSP/Phaser/cmake-build-debug/CMakeFiles/CMakeError.log".
+See also "/Volumes/SSD_Kasper/HKU/Jaar_3/CSD3/DSP/Phaser/cmake-build-debug/CMakeFiles/CMakeOutput.log".
+See also "/Volumes/SSD_Kasper/HKU/Jaar_3/CSD3/DSP/Phaser/cmake-build-debug/CMakeFiles/CMakeError.log".
