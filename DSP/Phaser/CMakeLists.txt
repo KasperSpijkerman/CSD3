@@ -5,9 +5,7 @@ cmake_minimum_required(VERSION 3.15)
 project(PhaserPlugin VERSION 1.0.0)
 
 # Include JUCE as a submodule or find it in your system
-# add_subdirectory(JUCE)                    # If JUCE is a submodule
-# or
-# find_package(JUCE CONFIG REQUIRED)        # If JUCE is installed on your system
+add_subdirectory(${CMAKE_SOURCE_DIR}/JUCE)  # JUCE is a submodule
 
 # Add the Phaser plugin
 juce_add_plugin(PhaserPlugin
@@ -32,7 +30,8 @@ target_sources(PhaserPlugin
         Phaser.cpp
         oscillator.cpp
         circBuffer.cpp
-        effect.cpp# Keep this for now; consider removing later if not needed
+        AllPassFilter.cpp
+        sineOscillator.cpp
         )
 
 # Compiler definitions (disable web browser and curl support for efficiency)
@@ -43,13 +42,15 @@ target_compile_definitions(PhaserPlugin
         JUCE_VST3_CAN_REPLACE_VST2=0  # VST3 should not replace VST2
         )
 
+# Specify the C++ standard
+set_target_properties(PhaserPlugin PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
 # Link necessary JUCE modules and other dependencies
 target_link_libraries(PhaserPlugin
         PRIVATE
-        juce::juce_audio_utils      # Link JUCE's audio utilities module
-        juce::juce_dsp              # Link JUCE's DSP module for audio processing
-        PUBLIC
-        juce::juce_recommended_config_flags  # Recommended configuration flags
-        juce::juce_recommended_lto_flags     # Recommended link-time optimization flags
-        juce::juce_recommended_warning_flags # Recommended warning flags
+        juce::juce_audio_processors  # Essential for audio processing plugins
+        juce::juce_audio_utils       # JUCE's audio utilities module
+        juce::juce_dsp               # JUCE's DSP module for audio processing
+        juce::juce_gui_basics        # JUCE's GUI module
+        juce::juce_core              # JUCE's core module
         )

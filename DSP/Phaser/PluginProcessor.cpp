@@ -12,7 +12,8 @@ PhaserAudioProcessor::PhaserAudioProcessor()
 {
     // Getting the parameter values and storing them.
     dryWet = apvts.getRawParameterValue("drywet");
-    rate = apvts.getRawParameterValue("rate");
+    rateL = apvts.getRawParameterValue("ratel");
+    rateR = apvts.getRawParameterValue("rater");
     depth = apvts.getRawParameterValue("depth");
     intensity = apvts.getRawParameterValue("intensity");
 }
@@ -90,7 +91,8 @@ void PhaserAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
 
     // Setting smoothing ramp time for adjusting the parameters smoothly
     previousDryWet.reset(sampleRate, 0.005);
-    previousRate.reset(sampleRate, 0.005);
+    previousRateL.reset(sampleRate, 0.005);
+    previousRateR.reset(sampleRate, 0.005);
     previousDepth.reset(sampleRate, 0.005);
     previousIntensity.reset(sampleRate, 0.005);
 }
@@ -123,20 +125,22 @@ void PhaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
     // Retrieve the current values of the parameters in real-time
-    auto currentDryWet = *dryWet;
-    auto currentRate = *rate;
-    auto currentDepth = *depth;
-    auto currentIntensity = *intensity;
+    float currentDryWet = dryWet->load();
+    float currentRateL = rateL->load();
+    float currentRateR = rateR->load();
+    float currentDepth = depth->load();
+    float currentIntensity = intensity->load();
 
     // Set smoothed target values for the parameters
     previousDryWet.setTargetValue(currentDryWet);
-    previousRate.setTargetValue(currentRate);
+    previousRateL.setTargetValue(currentRateL);
+    previousRateR.setTargetValue(currentRateR);
     previousDepth.setTargetValue(currentDepth);
     previousIntensity.setTargetValue(currentIntensity);
 
     // Set the parameters in the Phaser effect
     phaserEffect.setDryWet(previousDryWet.getNextValue());
-    phaserEffect.setRate(previousRate.getNextValue());
+    phaserEffect.setRate(previousRateL.getNextValue(), previousRateR.getNextValue());
     phaserEffect.setIntensity(previousIntensity.getNextValue());
 
     // Clearing any output channels that are not used
@@ -196,7 +200,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout PhaserAudioProcessor::create
 
     // Creating parameters for the Phaser
     params.push_back (std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "drywet", 1 }, "Dry-Wet", 0.0f, 1.0f, 0.5f));
-    params.push_back (std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"rate", 2}, "Rate", 0.0f, 5.0f, 1.0f));
+    params.push_back (std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"ratel", 2}, "Rate L", 0.0f, 5.0f, 1.0f));
+    params.push_back (std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"rater", 3}, "Rate R", 0.0f, 5.0f, 1.1f));
     params.push_back (std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"depth", 3}, "Depth", 0.0f, 4.0f, 0.5f));
     params.push_back (std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"intensity", 4}, "Intensity", 0.0f, 10.0f, 1.0f));
 

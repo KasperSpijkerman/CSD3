@@ -3,6 +3,14 @@
 // Constructor
 Phaser::Phaser()
 {
+    // Reset all filters to their initial state
+    for (int ch = 0; ch < 2; ++ch)
+    {
+        for (int i = 0; i < 5; ++i)
+        {
+            allPassFilters[ch][i].reset();
+        }
+    }
 }
 
 // Destructor
@@ -16,30 +24,30 @@ void Phaser::prepareToPlay(double sampleRate)
     this->samplerateFX = sampleRate;
 
     // Set the sample rate for the LFO oscillators
-    for (Oscillator& oscillator : oscillators)
+    for (SineOscillator& oscillator : oscillators)
     {
         oscillator.setSamplerate(samplerateFX);
     }
 
-    // Initialize the dry/wet mix (inherited from Effect base class)
-    setDryWet(0.5f);  // Default dry/wet to 50% wet
+    // Default dry/wet to 50% wet
+    setDryWet(0.5f);
 }
 
 // Calculate modulation signal and apply it to the all-pass filters for each channel
 void Phaser::calcMod(int channel)
 {
-    // Tick the oscillator for this channel (LFO for modulating the filters)
+    // Tick the oscillator (LFO for modulating the filters)
     oscillators[channel].tick();
 
-    // Get the modulation signal from the oscillator (typically a sine or triangle wave)
-    float modulationSignal = (oscillators[channel].getSample() + 1.0f) / 2.0f;  // Normalize to [0, 1]
+    // Modulation signal (sine wave, normalized to [0, 1])
+    float modulationSignal = (oscillators[channel].getSample() + 1.0f) / 2.0f;
 
-    // Adjust the all-pass filter cutoff frequency based on the modulation signal
-    // Placeholder: You will implement the all-pass filter logic in the output function
-    for (int i = 0; i < 4; ++i)
+    // Set filter modulation coefficient
+    for (int i = 0; i < 5; ++i)
     {
-        // Example: Modulate the cutoff frequency of each filter in the chain
-        allPassFilters[channel][i] = modulationSignal * intensity;
+        // Modulate the all-pass filter coefficient 'g', safely clamped to 0.01 - 0.99
+        float g = juce::jlimit(0.01f, 0.99f, modulationSignal * intensity);
+        allPassFilters[channel][i].setCoefficient(g);
     }
 }
 
@@ -49,34 +57,33 @@ float Phaser::output(float input, int channel)
     // Calculate modulation for the current channel
     calcMod(channel);
 
-    // Process the input through all-pass filters (basic example, adjust with real implementation)
+    // Process the input through the chain of all-pass filters
     float processedSignal = input;
-    for (int i = 0; i < 4; ++i)
+
+    for (int i = 0; i < 5; ++i)
     {
-        // Simple all-pass filter placeholder (replace with actual filter processing)
-        // Normally you would process the input through actual all-pass filters here
-        processedSignal = allPassFilters[channel][i] * processedSignal + input * (1.0f - allPassFilters[channel][i]);
+        processedSignal = allPassFilters[channel][i].process(processedSignal);
     }
 
     // Apply dry/wet mix (blend processed signal with the original input)
-    return (input * dry) + (processedSignal * wet);  // dry and wet inherited from Effect class
+    return (input * dry) + (processedSignal * wet);
 }
 
 // Set the intensity (modulation depth)
-void Phaser::setIntensity(float intensity)
+void Phaser::setIntensity(float newIntensity)
 {
-    this->intensity = intensity;
+    this->intensity = juce::jlimit(0.0f, 1.0f, newIntensity);  // Keep intensity in a safe range
 }
 
 // Set the modulation rate (speed of the LFO)
-void Phaser::setRate(float rateL, float rateR)
+void Phaser::setRate(float newRateL, float newRateR)
 {
-    oscillators[0].setFrequency(rateL);
-    oscillators[1].setFrequency(rateR);
+    oscillators[0].setFrequency(newRateL);
+    oscillators[1].setFrequency(newRateR);
 }
 
-// Set the dry/wet mix (this overrides the base class method)
+// Set the dry/wet mix (overrides base class)
 void Phaser::setDryWetMix(float mix)
 {
-    setDryWet(mix);  // Call the base class method to handle dry/wet logic
+    setDryWet(mix);
 }
