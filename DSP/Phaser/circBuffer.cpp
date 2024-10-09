@@ -4,20 +4,19 @@
 #include <iterator>
 #include <cmath>
 
-// short 
 using namespace std;
 
 // Constructor
 CircBuffer::CircBuffer(uint size) : buffer(new float[size]), currentSize(size)
 {
     // Initialize the buffer with zero
-    memset(buffer, 0, currentSize * sizeof(float));  // Fixed the usage of currentSize instead of bufferSize
+    memset(buffer, 0, currentSize * sizeof(float));
 }
 
 // Destructor
 CircBuffer::~CircBuffer()
 {
-    deleteBuffer();  // Clean up the buffer memory
+    deleteBuffer();
 }
 
 // Input value at writeHead and increment writeHead
@@ -27,16 +26,23 @@ void CircBuffer::input(float value)
     incrementWrite();            // Increment write head
 }
 
-// Reading values and outputting them with interpolation
+// Reading values and outputting them with cubic interpolation
 float CircBuffer::output()
 {
-    // Linear interpolation
-    int i = (int)trunc(readHead);
-    int iNext = (i + 1) % currentSize;  // Ensure i + 1 wraps around the buffer correctly
+    // Use cubic interpolation for smooth output
+    int i0 = (int)trunc(readHead) - 1;
+    int i1 = (i0 + 1) % currentSize;
+    int i2 = (i1 + 1) % currentSize;
+    int i3 = (i2 + 1) % currentSize;
 
-    // Interpolate between two adjacent buffer values
-    float factor = readHead - (float)i;
-    return util.linearMap(factor, buffer[i], buffer[iNext]);  // Safe access of buffer[iNext]
+    // Ensure the indices wrap around the buffer
+    if (i0 < 0) i0 += currentSize;
+
+    // Fractional part for interpolation
+    float t = readHead - (float)i1;
+
+    // Perform cubic interpolation
+    return util.cubicInterpolate(buffer[i0], buffer[i1], buffer[i2], buffer[i3], t);
 }
 
 // Set the distance between writeHead and readHead
@@ -48,7 +54,7 @@ void CircBuffer::setDistance (float distance)
     if (readHeadBuffer < 0) {
         readHead = readHeadBuffer + currentSize;
     } else {
-        readHead = fmod(readHeadBuffer, currentSize);  // Use fmod for safer wrapping
+        readHead = fmod(readHeadBuffer, currentSize);
     }
 }
 

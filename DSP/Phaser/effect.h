@@ -1,13 +1,13 @@
 #pragma once
 #include <iostream>
 
-class Effect 
+class Effect
 {
-public:    
+public:
     // prepare to play and dry wet
     virtual void prepareToPlay (double sampleRate) = 0;
     void setDryWet(float dryWet);
-protected: 
+protected:
     // dry and wet for every effect
     float dry { 0 };
     float wet { 0 };

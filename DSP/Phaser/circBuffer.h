@@ -1,7 +1,6 @@
+#pragma once
 #include "effect.h"
 #include "utilities.h"
-
-#pragma once
 
 class CircBuffer {
 
@@ -14,7 +13,7 @@ public:
 
     // Input/output and incrementing the heads
     void input(float value);
-    float output();
+    float output();  // This will now use cubic interpolation
     void incrementHeads();
 
     // Setters

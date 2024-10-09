@@ -9,7 +9,7 @@ project(PhaserPlugin VERSION 1.0.0)
 # Add the Phaser plugin
 juce_add_plugin(PhaserPlugin
         VERSION 1.0.0                                # Plugin version
-        COMPANY_NAME "YourCompanyName"               # Plugin author/company name
+        COMPANY_NAME "uso"               # Plugin author/company name
         IS_EFFECT TRUE                               # This is an audio effect (not a synth)
         NEEDS_MIDI_INPUT FALSE                       # No MIDI input needed
         NEEDS_MIDI_OUTPUT FALSE                      # No MIDI output needed
@@ -31,6 +31,7 @@ target_sources(PhaserPlugin
         circBuffer.cpp
         AllPassFilter.cpp
         sineOscillator.cpp
+        effect.cpp
         )
 
 # Compiler definitions (disable web browser and curl support for efficiency)
