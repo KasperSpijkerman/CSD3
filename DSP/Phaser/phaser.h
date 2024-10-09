@@ -1,7 +1,10 @@
 #pragma once
 #include "effect.h"
 #include "sineOscillator.h"
-#include "allPassFilter.h" // Include the new all-pass filter class
+#include "AllPassFilter.h" // Include the new all-pass filter class
+#include <juce_core/juce_core.h>
+
+using namespace juce;
 
 class Phaser : public Effect
 {

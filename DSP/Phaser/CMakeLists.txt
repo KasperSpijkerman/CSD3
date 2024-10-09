@@ -4,8 +4,7 @@ cmake_minimum_required(VERSION 3.15)
 # Project name and version
 project(PhaserPlugin VERSION 1.0.0)
 
-# Include JUCE as a submodule or find it in your system
-add_subdirectory(${CMAKE_SOURCE_DIR}/JUCE)  # JUCE is a submodule
+
 
 # Add the Phaser plugin
 juce_add_plugin(PhaserPlugin

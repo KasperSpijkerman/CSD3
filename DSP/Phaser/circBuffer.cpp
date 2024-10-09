@@ -7,87 +7,90 @@
 // short 
 using namespace std;
 
+// Constructor
 CircBuffer::CircBuffer(uint size) : buffer(new float[size]), currentSize(size)
 {
-    // setting all values to zero in the buffer.
-    memset(buffer, 0, sizeof(buffer));
+    // Initialize the buffer with zero
+    memset(buffer, 0, currentSize * sizeof(float));  // Fixed the usage of currentSize instead of bufferSize
 }
 
+// Destructor
 CircBuffer::~CircBuffer()
 {
-    deleteBuffer();
+    deleteBuffer();  // Clean up the buffer memory
 }
 
-// writing values according to list with values
+// Input value at writeHead and increment writeHead
 void CircBuffer::input(float value)
-{  
-    buffer[writeHead] = value;   
-}
-
-// reading values and outputting them according to readhead, interpolating the output for no clicks
-float CircBuffer::output() 
 {
-    // Interpolating output
-    int i = (int) trunc (readHead);
-    float factor = readHead - (float) i;
-    return util.linearMap(factor, buffer[i], buffer[i + 1]);
+    buffer[writeHead] = value;   // Store the value at the write head
+    incrementWrite();            // Increment write head
 }
 
-// setting a distance between readheader and writeheader
+// Reading values and outputting them with interpolation
+float CircBuffer::output()
+{
+    // Linear interpolation
+    int i = (int)trunc(readHead);
+    int iNext = (i + 1) % currentSize;  // Ensure i + 1 wraps around the buffer correctly
+
+    // Interpolate between two adjacent buffer values
+    float factor = readHead - (float)i;
+    return util.linearMap(factor, buffer[i], buffer[iNext]);  // Safe access of buffer[iNext]
+}
+
+// Set the distance between writeHead and readHead
 void CircBuffer::setDistance (float distance)
 {
-    
     this->distance = distance;
     float readHeadBuffer = writeHead - distance;
-    if(readHeadBuffer < 0) {
+
+    if (readHeadBuffer < 0) {
         readHead = readHeadBuffer + currentSize;
+    } else {
+        readHead = fmod(readHeadBuffer, currentSize);  // Use fmod for safer wrapping
     }
-    else if(readHeadBuffer > currentSize)
-    {
-        readHead = readHeadBuffer - currentSize;
-    }
-     else {
-        readHead = readHeadBuffer;
-    }
-    
 }
-// incrementing the writehead 
+
+// Increment the write head and wrap it
 inline void CircBuffer::incrementWrite()
 {
     writeHead++;
     wrapwriteHeader(writeHead);
 }
-// incrementing the readhead
+
+// Increment the read head and wrap it
 inline void CircBuffer::incrementRead()
 {
     readHead++;
     wrapreadHeader(readHead);
 }
-// incrementing both heads
-void CircBuffer::incrementHeads() 
+
+// Increment both heads
+void CircBuffer::incrementHeads()
 {
     incrementRead();
     incrementWrite();
 }
-// deleting buffer 
+
+// Delete the buffer
 void CircBuffer::deleteBuffer()
 {
     delete[] buffer;
 }
-// starting at zero again, float
+
+// Wrap readHead around to 0 if it exceeds currentSize
 inline void CircBuffer::wrapreadHeader(float& head)
 {
-     if (head >= currentSize)
-        {
-            head = 0 ;
-        }
-}
-// starting at zero again for writheader, int instead of float
-inline void CircBuffer::wrapwriteHeader(uint& head)
-{
-    if (head >= currentSize)
-    {
-        head = 0 ;
+    if (head >= currentSize) {
+        head = 0;
     }
 }
 
+// Wrap writeHead around to 0 if it exceeds currentSize
+inline void CircBuffer::wrapwriteHeader(uint& head)
+{
+    if (head >= currentSize) {
+        head = 0;
+    }
+}
