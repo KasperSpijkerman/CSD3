@@ -14,9 +14,7 @@ Phaser::Phaser()
 }
 
 // Destructor
-Phaser::~Phaser()
-{
-}
+Phaser::~Phaser() {}
 
 // Prepare the phaser (set sample rate for oscillators, initialize any needed variables)
 void Phaser::prepareToPlay(double sampleRate)
@@ -42,11 +40,14 @@ void Phaser::calcMod(int channel)
     // Modulation signal (sine wave, normalized to [0, 1])
     float modulationSignal = (oscillators[channel].getSample() + 1.0f) / 2.0f;
 
+    // Apply smoothing to the modulation signal using a low-pass filter or smoothing function
+    float smoothedModulation = smoothingFunction(modulationSignal);
+
     // Set filter modulation coefficient
     for (int i = 0; i < 5; ++i)
     {
         // Modulate the all-pass filter coefficient 'g', safely clamped to 0.01 - 0.99
-        float g = juce::jlimit(0.01f, 0.99f, modulationSignal * intensity);
+        float g = std::clamp(smoothedModulation * intensity, 0.01f, 0.99f);
         allPassFilters[channel][i].setCoefficient(g);
     }
 }
@@ -72,7 +73,7 @@ float Phaser::output(float input, int channel)
 // Set the intensity (modulation depth)
 void Phaser::setIntensity(float newIntensity)
 {
-    this->intensity = juce::jlimit(0.0f, 1.0f, newIntensity);  // Keep intensity in a safe range
+    this->intensity = std::clamp(newIntensity, 0.0f, 1.0f);  // Keep intensity in a safe range
 }
 
 // Set the modulation rate (speed of the LFO)
@@ -86,4 +87,13 @@ void Phaser::setRate(float newRateL, float newRateR)
 void Phaser::setDryWetMix(float mix)
 {
     setDryWet(mix);
+}
+
+// Simple smoothing function using exponential smoothing
+float Phaser::smoothingFunction(float input)
+{
+    static float lastOutput = 0.0f;
+    float smoothingAmount = 0.05f;  // Adjust this value to control the amount of smoothing
+    lastOutput = lastOutput * (1.0f - smoothingAmount) + input * smoothingAmount;
+    return lastOutput;
 }

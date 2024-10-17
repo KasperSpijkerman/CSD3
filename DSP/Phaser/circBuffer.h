@@ -13,7 +13,7 @@ public:
 
     // Input/output and incrementing the heads
     void input(float value);
-    float output();  // This will now use cubic interpolation
+    float output();  // Now uses more stable cubic interpolation
     void incrementHeads();
 
     // Setters
@@ -22,8 +22,8 @@ public:
 
 protected:
     // Wrapping and incrementing heads
-    inline void wrapreadHeader(float& head);
-    inline void wrapwriteHeader(uint& head);
+    inline void wrapReadHead(float& head);
+    inline void wrapWriteHead(uint& head);
     inline void incrementWrite();
     inline void incrementRead();
     void deleteBuffer();
@@ -44,3 +44,4 @@ protected:
     uint writeHead { 0 };
     float readHead { 0 };  // Float to allow interpolation
 };
+

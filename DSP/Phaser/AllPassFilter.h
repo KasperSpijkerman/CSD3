@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 
 class AllPassFilter
 {
@@ -6,7 +7,7 @@ public:
     // Constructor
     AllPassFilter();
 
-    // Sets the 'g' coefficient, which modulates the all-pass filter's response
+    // Set the coefficient 'g', ensuring it stays in a valid range
     void setCoefficient(float newG);
 
     // Process a single audio sample through the all-pass filter
@@ -16,7 +17,10 @@ public:
     void reset();
 
 private:
-    float g;           // Coefficient for the all-pass filter
-    float prevInput;    // Previous input sample
-    float prevOutput;   // Previous output sample
+    // Manually enforce range without std::clamp or juce::jlimit
+    void ensureValidCoefficient(float& gValue);
+
+    float g { 0.0f };        // Coefficient for the all-pass filter
+    float prevInput { 0.0f };  // Previous input sample
+    float prevOutput { 0.0f }; // Previous output sample
 };

@@ -1,10 +1,8 @@
 #pragma once
 #include "effect.h"
 #include "sineOscillator.h"
-#include "AllPassFilter.h" // Include the new all-pass filter class
+#include "AllPassFilter.h"  // Include the all-pass filter class
 #include <juce_core/juce_core.h>
-
-using namespace juce;
 
 class Phaser : public Effect
 {
@@ -14,6 +12,7 @@ public:
 
     void prepareToPlay(double sampleRate) override;
     float output(float input, int channel);
+    float smoothingFunction(float input);
     void setIntensity(float intensity);
     void setRate(float rateL, float rateR);
     void setDryWetMix(float mix);

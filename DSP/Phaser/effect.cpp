@@ -3,16 +3,11 @@
 
 void Effect::setDryWet(float wetInput)
 {
-	// making sure input cannot go outside of range
-	if(wetInput > 1)
-	{
-		wetInput = 1;
-	}
-	else if(wetInput < 0)
-	{
-		wetInput = 0;
-	}
-	// dry is the opposite of wet
-	wet = wetInput;
-	dry = 1 - wetInput;
+    // Use a clamping function (if using JUCE, this would be juce::jlimit)
+    wetInput = std::clamp(wetInput, 0.0f, 1.0f);  // Ensure it's within 0-1 range
+
+    // Smoothing for better transitions to avoid clicks (can also be done with a smoothing filter)
+    float smoothingFactor = 0.005f;  // Adjust this value to make transitions smoother
+    wet = wet * (1.0f - smoothingFactor) + wetInput * smoothingFactor;
+    dry = 1.0f - wet;
 }

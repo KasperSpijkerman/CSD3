@@ -9,7 +9,8 @@ AllPassFilter::AllPassFilter()
 // Set the coefficient 'g' for the all-pass filter
 void AllPassFilter::setCoefficient(float newG)
 {
-    // 'g' needs to be within a valid range to avoid instability
+    // Ensure that the coefficient is in the safe range
+    ensureValidCoefficient(newG);
     g = newG;
 }
 
@@ -31,4 +32,13 @@ void AllPassFilter::reset()
 {
     prevInput = 0.0f;
     prevOutput = 0.0f;
+}
+
+// Ensure that 'g' is in the range [0.01, 0.99]
+void AllPassFilter::ensureValidCoefficient(float& gValue)
+{
+    if (gValue < 0.01f)
+        gValue = 0.01f;
+    else if (gValue > 0.99f)
+        gValue = 0.99f;
 }
