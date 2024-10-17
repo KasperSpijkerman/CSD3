@@ -35,10 +35,11 @@ void CircBuffer::input(float value)
 }
 
 // Output value using cubic interpolation
+// Output value using cubic interpolation
 float CircBuffer::output()
 {
     // Ensure readHead stays within buffer bounds
-    int i0 = (int)trunc(readHead) - 1;
+    int i0 = (int)floor(readHead) - 1;
     int i1 = (i0 + 1) % currentSize;
     int i2 = (i1 + 1) % currentSize;
     int i3 = (i2 + 1) % currentSize;
@@ -46,8 +47,8 @@ float CircBuffer::output()
     // Ensure the indices wrap around the buffer
     if (i0 < 0) i0 += currentSize;
 
-    // Fractional part for interpolation
-    float t = readHead - (float)i1;
+    // Fractional part for interpolation (0 <= t < 1)
+    float t = readHead - floor(readHead);
 
     // Use cubic interpolation for smooth output
     return util.cubicInterpolate(buffer[i0], buffer[i1], buffer[i2], buffer[i3], t);

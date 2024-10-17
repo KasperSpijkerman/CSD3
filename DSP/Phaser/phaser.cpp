@@ -67,7 +67,9 @@ float Phaser::output(float input, int channel)
     }
 
     // Apply dry/wet mix (blend processed signal with the original input)
-    return (input * dry) + (processedSignal * wet);
+    float mixedOutput = (input * dry) + (processedSignal * wet);
+
+    return mixedOutput;
 }
 
 // Set the intensity (modulation depth)
