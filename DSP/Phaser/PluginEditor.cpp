@@ -34,14 +34,6 @@ PhaserAudioProcessorEditor::PhaserAudioProcessorEditor (PhaserAudioProcessor& p,
     rateRLabel.attachToComponent(&rateRSlider, false);
     addAndMakeVisible(rateRSlider);
 
-    // Depth slider and label
-    depthSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    depthSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 25);
-    depthSliderAttachment = std::make_unique<SliderAttachment>(audioProcessor.apvts, "depth", depthSlider);
-    depthLabel.setText("Depth", juce::dontSendNotification);
-    depthLabel.attachToComponent(&depthSlider, false);
-    addAndMakeVisible(depthSlider);
-
     // Intensity slider and label
     intensitySlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     intensitySlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 25);
@@ -108,7 +100,6 @@ void PhaserAudioProcessorEditor::resized()
     drywetLabel.setFont(labelFont);
     rateLLabel.setFont(labelFont);
     rateRLabel.setFont(labelFont);
-    depthLabel.setFont(labelFont);
     intensityLabel.setFont(labelFont);
 
     // Adjust Y offset for labels to prevent overlap with knobs
@@ -128,11 +119,11 @@ void PhaserAudioProcessorEditor::resized()
 
     // Layout the second row of sliders (Depth, Intensity)
     int secondRowY = juce::jmin(startY + sliderHeight + 40, totalHeight - sliderHeight - 60);  // Ensure it doesn't go out of bounds
-    depthSlider.setBounds(startX, secondRowY, sliderWidth, sliderHeight); // Place on left
+
     intensitySlider.setBounds(startX + (sliderWidth * 2), secondRowY, sliderWidth, sliderHeight); // Place on right
 
     // Adjust labels for the bottom sliders
-    depthLabel.setBounds(depthSlider.getX(), depthSlider.getY() - labelHeight, sliderWidth, labelHeight);
+
     intensityLabel.setBounds(intensitySlider.getX(), intensitySlider.getY() - labelHeight, sliderWidth, labelHeight);
 
     // Set the text boxes (number boxes) under the sliders to resize dynamically
@@ -140,7 +131,7 @@ void PhaserAudioProcessorEditor::resized()
     drywetSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, sliderWidth, textBoxHeight);
     rateLSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, sliderWidth, textBoxHeight);
     rateRSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, sliderWidth, textBoxHeight);
-    depthSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, sliderWidth, textBoxHeight);
+
     intensitySlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, sliderWidth, textBoxHeight);
 
     // Set the slider thumb color and other look-and-feel properties

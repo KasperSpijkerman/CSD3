@@ -1,12 +1,31 @@
-//
-// Created by Kasper Spijkerman on 03/10/2024.
-//
-
 #include "sineOscillator.h"
 
+SineOscillator::SineOscillator(float frequency, float amplitude, float samplerate)
+        : frequency(frequency), amplitude(amplitude), samplerate(samplerate) {}
 
-void SineOscillator::calculate() {
-    sample = amplitude * std::sin(2.0f * M_PI * phase);
+// Set the frequency
+void SineOscillator::setFrequency(float newFrequency) {
+    frequency = newFrequency;
+}
+
+// Set the amplitude
+void SineOscillator::setAmplitude(float newAmplitude) {
+    amplitude = newAmplitude;
+}
+
+// Set the samplerate
+void SineOscillator::setSamplerate(float newSamplerate) {
+    samplerate = newSamplerate;
+}
+
+// Get the current sample
+float SineOscillator::getSample() {
+    return sample;
+}
+
+// Update the oscillator's state, increment the phase and calculate the next sample
+void SineOscillator::tick() {
+    calculate();
     phase += frequency / samplerate;
 
     // Smooth wrapping
@@ -16,4 +35,9 @@ void SineOscillator::calculate() {
     while (phase < 0.0f) {
         phase += 1.0f;
     }
+}
+
+// Calculate the current sample based on the sine wave formula
+void SineOscillator::calculate() {
+    sample = amplitude * std::sin(2.0f * M_PI * phase);
 }

@@ -27,11 +27,8 @@ target_sources(PhaserPlugin
         PluginEditor.cpp
         PluginProcessor.cpp
         Phaser.cpp
-        oscillator.cpp
-        circBuffer.cpp
         AllPassFilter.cpp
         sineOscillator.cpp
-        effect.cpp
         )
 
 # Compiler definitions (disable web browser and curl support for efficiency)

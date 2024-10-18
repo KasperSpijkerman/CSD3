@@ -10,9 +10,12 @@ void AllPassFilter::setCoefficient(float newG)
 {
     ensureValidCoefficient(newG);
 
-    // Improved smoothing for coefficient changes using exponential smoothing
-    float smoothingFactor = 0.03f;  // Increase this value for smoother transitions
+    // Apply a small smoothing to avoid sharp changes, if needed
+    float smoothingFactor = 0.03f; // Adjust based on your application requirements
     g += (newG - g) * smoothingFactor;
+
+    // Ensure 'g' stays in the valid range after smoothing
+    ensureValidCoefficient(g);
 }
 
 // Process a single sample through the all-pass filter

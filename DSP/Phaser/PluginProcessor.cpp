@@ -14,7 +14,6 @@ PhaserAudioProcessor::PhaserAudioProcessor()
     dryWet = apvts.getRawParameterValue("drywet");
     rateL = apvts.getRawParameterValue("ratel");
     rateR = apvts.getRawParameterValue("rater");
-    depth = apvts.getRawParameterValue("depth");
     intensity = apvts.getRawParameterValue("intensity");
 }
 
@@ -93,8 +92,7 @@ void PhaserAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
     previousDryWet.reset(sampleRate, 0.001);   // Fast response for dry/wet
     previousRateL.reset(sampleRate, 0.002);    // Slightly slower for rate changes
     previousRateR.reset(sampleRate, 0.002);
-    previousDepth.reset(sampleRate, 0.003);    // Smoother for depth changes
-    previousIntensity.reset(sampleRate, 0.003);
+    previousIntensity.reset(sampleRate, 0.003); // Smoothing for intensity
 }
 
 void PhaserAudioProcessor::releaseResources()
@@ -128,14 +126,12 @@ void PhaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     float currentDryWet = dryWet->load();
     float currentRateL = rateL->load();
     float currentRateR = rateR->load();
-    float currentDepth = depth->load();
     float currentIntensity = intensity->load();
 
     // Set smoothed target values for the parameters
     previousDryWet.setTargetValue(currentDryWet);
     previousRateL.setTargetValue(currentRateL);
     previousRateR.setTargetValue(currentRateR);
-    previousDepth.setTargetValue(currentDepth);
     previousIntensity.setTargetValue(currentIntensity);
 
     // Set the parameters in the Phaser effect
@@ -146,8 +142,6 @@ void PhaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     // Clearing any output channels that are not used
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
-
-
 
     // Processing the audio for each channel
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
@@ -201,11 +195,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout PhaserAudioProcessor::create
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
 
     // Creating parameters for the Phaser
-    params.push_back (std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "drywet", 1 }, "Dry-Wet", 0.0f, 1.0f, 0.5f));
-    params.push_back (std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"ratel", 2}, "Rate L", 0.0f, 5.0f, 1.0f));
-    params.push_back (std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"rater", 3}, "Rate R", 0.0f, 5.0f, 1.1f));
-    params.push_back (std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"depth", 3}, "Depth", 0.0f, 4.0f, 0.5f));
-    params.push_back (std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"intensity", 4}, "Intensity", 0.0f, 10.0f, 1.0f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID { "drywet", 1 }, "Dry-Wet", 0.0f, 1.0f, 0.5f));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID { "ratel", 2 }, "Rate L", 0.0f, 5.0f, 1.0f));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID { "rater", 3 }, "Rate R", 0.0f, 5.0f, 1.1f));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID { "intensity", 4 }, "Intensity", 0.0f, 1.0f, 0.5f));
 
     return { params.begin(), params.end() };
 }

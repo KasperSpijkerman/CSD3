@@ -68,14 +68,12 @@ private:
     juce::SmoothedValue<float> previousDryWet {0.0f};
     juce::SmoothedValue<float> previousRateL { 0.0f };
     juce::SmoothedValue<float> previousRateR { 0.0f };
-    juce::SmoothedValue<float> previousDepth {0.0f};
     juce::SmoothedValue<float> previousIntensity {0.0f};
 
     // The actual real-time atomic float values of parameters, initialized with null pointers for protection
     std::atomic<float>* dryWet = nullptr;
     std::atomic<float>* rateL = nullptr;
     std::atomic<float>* rateR = nullptr;
-    std::atomic<float>* depth = nullptr;
     std::atomic<float>* intensity = nullptr;
 
     // Main volume variable

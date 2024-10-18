@@ -38,11 +38,5 @@ private:
     juce::Slider intensitySlider;
     juce::Label  intensityLabel;
     std::unique_ptr<SliderAttachment> intensitySliderAttachment;
-
-    // Depth (modulation depth)
-    juce::Slider depthSlider;
-    juce::Label  depthLabel;
-    std::unique_ptr<SliderAttachment> depthSliderAttachment;
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PhaserAudioProcessorEditor)
 };
