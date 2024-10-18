@@ -40,45 +40,45 @@ float CircBuffer::output()
 {
     // Ensure readHead stays within buffer bounds
     int i0 = (int)floor(readHead) - 1;
+    if (i0 < 0) i0 += currentSize;
+
     int i1 = (i0 + 1) % currentSize;
     int i2 = (i1 + 1) % currentSize;
     int i3 = (i2 + 1) % currentSize;
 
-    // Ensure the indices wrap around the buffer
-    if (i0 < 0) i0 += currentSize;
-
-    // Fractional part for interpolation (0 <= t < 1)
+    // Fractional part for interpolation
     float t = readHead - floor(readHead);
 
-    // Use cubic interpolation for smooth output
+    // Perform cubic interpolation
     return util.cubicInterpolate(buffer[i0], buffer[i1], buffer[i2], buffer[i3], t);
 }
 
-// Set the distance between writeHead and readHead
-void CircBuffer::setDistance(float distance)
-{
+// CircBuffer::setDistance (adjusting to ensure smooth transitions)
+void CircBuffer::setDistance(float distance) {
     this->distance = distance;
-    float readHeadBuffer = writeHead - distance;
 
-    if (readHeadBuffer < 0) {
-        readHead = readHeadBuffer + currentSize;
-    } else {
-        readHead = fmod(readHeadBuffer, currentSize);
+    // Smoothly adjust the readHead over several samples instead of jumping
+    float targetReadHead = writeHead - distance;
+    if (targetReadHead < 0) {
+        targetReadHead += currentSize;
+    }
+
+    // Apply gradual change to readHead
+    readHead += (targetReadHead - readHead) * 0.1f; // Smooth transition, tweak smoothing factor
+    if (readHead >= currentSize) {
+        readHead -= currentSize;
     }
 }
 
-// Increment the write head and wrap it
+// Ensure the `incrementWrite` and `incrementRead` functions increment correctly
 inline void CircBuffer::incrementWrite()
 {
-    writeHead++;
-    wrapWriteHead(writeHead);
+    writeHead = (writeHead + 1) % currentSize;  // Wrap using modulo
 }
 
-// Increment the read head and wrap it
 inline void CircBuffer::incrementRead()
 {
-    readHead++;
-    wrapReadHead(readHead);
+    readHead = fmod(readHead + 1, currentSize);  // Use `fmod` for smooth wrap-around
 }
 
 // Increment both heads

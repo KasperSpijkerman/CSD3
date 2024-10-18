@@ -2,6 +2,7 @@
 
 // Constructor
 Phaser::Phaser()
+        : delayBuffer{CircBuffer(1024), CircBuffer(1024)} // Initializing with a default size (e.g., 1024 samples)
 {
     // Reset all filters to their initial state
     for (int ch = 0; ch < 2; ++ch)
@@ -29,28 +30,32 @@ void Phaser::prepareToPlay(double sampleRate)
 
     // Default dry/wet to 50% wet
     setDryWet(0.5f);
+    // Initialize circular buffers for both channels
+    for (int i = 0; i < 2; ++i) {
+        delayBuffer[i].setSize(static_cast<uint>(sampleRate * maxDelayTime)); // Set up max size based on maxDelayTime
+    }
 }
 
 // Calculate modulation signal and apply it to the all-pass filters for each channel
-void Phaser::calcMod(int channel)
-{
-    // Tick the oscillator (LFO for modulating the filters)
+void Phaser::calcMod(int channel) {
+    // Generate a new sample from the LFO
     oscillators[channel].tick();
-
-    // Modulation signal (sine wave, normalized to [0, 1])
     float modulationSignal = (oscillators[channel].getSample() + 1.0f) / 2.0f;
 
-    // Apply smoothing to the modulation signal using a low-pass filter or smoothing function
+    // Smooth the modulation signal to prevent abrupt changes
     float smoothedModulation = smoothingFunction(modulationSignal);
 
-    // Set filter modulation coefficient
-    for (int i = 0; i < 5; ++i)
-    {
-        // Modulate the all-pass filter coefficient 'g', safely clamped to 0.01 - 0.99
-        float g = std::clamp(smoothedModulation * intensity, 0.01f, 0.99f);
+    // Adjust distance for delayBuffer if needed (if you're using the delay buffer)
+    float adjustedDistance = smoothedModulation * maxDelayTime;
+    delayBuffer[channel].setDistance(adjustedDistance);
+
+    // Directly set coefficients on each all-pass filter
+    for (int i = 0; i < 5; ++i) {
+        float g = std::clamp(smoothedModulation * intensity, 0.05f, 0.95f);
         allPassFilters[channel][i].setCoefficient(g);
     }
 }
+
 
 // Process the audio sample (apply phaser effect)
 float Phaser::output(float input, int channel)
@@ -66,11 +71,20 @@ float Phaser::output(float input, int channel)
         processedSignal = allPassFilters[channel][i].process(processedSignal);
     }
 
-    // Apply dry/wet mix (blend processed signal with the original input)
+    // Ensure dry/wet mix values are valid
+    dry = std::clamp(dry, 0.0f, 1.0f);
+    wet = std::clamp(wet, 0.0f, 1.0f);
+
+    // Mix processed signal with the original input based on dry/wet values
     float mixedOutput = (input * dry) + (processedSignal * wet);
+
+    // Apply gain compensation if necessary (optional)
+    float gainCompensation = 1.0f;  // Adjust as needed to normalize volume
+    mixedOutput *= gainCompensation;
 
     return mixedOutput;
 }
+
 
 // Set the intensity (modulation depth)
 void Phaser::setIntensity(float newIntensity)
@@ -85,17 +99,16 @@ void Phaser::setRate(float newRateL, float newRateR)
     oscillators[1].setFrequency(newRateR);
 }
 
-// Set the dry/wet mix (overrides base class)
-void Phaser::setDryWetMix(float mix)
+void Phaser::setDryWet(float mix)
 {
-    setDryWet(mix);
+    // Ensure the mix value is clamped between 0.0 and 1.0
+    dry = std::clamp(1.0f - mix, 0.0f, 1.0f);
+    wet = std::clamp(mix, 0.0f, 1.0f);
 }
 
-// Simple smoothing function using exponential smoothing
-float Phaser::smoothingFunction(float input)
-{
+float Phaser::smoothingFunction(float input) {
     static float lastOutput = 0.0f;
-    float smoothingAmount = 0.05f;  // Adjust this value to control the amount of smoothing
+    float smoothingAmount = 0.02f; // Adjust this value to control the amount of smoothing
     lastOutput = lastOutput * (1.0f - smoothingAmount) + input * smoothingAmount;
     return lastOutput;
 }

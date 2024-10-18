@@ -6,12 +6,13 @@ AllPassFilter::AllPassFilter()
 {
 }
 
-// Set the coefficient 'g' for the all-pass filter
 void AllPassFilter::setCoefficient(float newG)
 {
-    // Ensure that the coefficient is in the safe range
     ensureValidCoefficient(newG);
-    g = newG;
+
+    // Improved smoothing for coefficient changes using exponential smoothing
+    float smoothingFactor = 0.03f;  // Increase this value for smoother transitions
+    g += (newG - g) * smoothingFactor;
 }
 
 // Process a single sample through the all-pass filter

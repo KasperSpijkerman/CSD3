@@ -90,11 +90,11 @@ void PhaserAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
     phaserEffect.prepareToPlay(sampleRate);
 
     // Setting smoothing ramp time for adjusting the parameters smoothly
-    previousDryWet.reset(sampleRate, 0.005);
-    previousRateL.reset(sampleRate, 0.005);
-    previousRateR.reset(sampleRate, 0.005);
-    previousDepth.reset(sampleRate, 0.005);
-    previousIntensity.reset(sampleRate, 0.005);
+    previousDryWet.reset(sampleRate, 0.001);   // Fast response for dry/wet
+    previousRateL.reset(sampleRate, 0.002);    // Slightly slower for rate changes
+    previousRateR.reset(sampleRate, 0.002);
+    previousDepth.reset(sampleRate, 0.003);    // Smoother for depth changes
+    previousIntensity.reset(sampleRate, 0.003);
 }
 
 void PhaserAudioProcessor::releaseResources()
@@ -146,6 +146,8 @@ void PhaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     // Clearing any output channels that are not used
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
+
+
 
     // Processing the audio for each channel
     for (int channel = 0; channel < totalNumInputChannels; ++channel)

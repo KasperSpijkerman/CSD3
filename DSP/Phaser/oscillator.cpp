@@ -40,13 +40,23 @@ float Oscillator::getFrequency()
   return frequency;
 }
 
-void Oscillator::tick()
-{
-  // increment the phase to allow calculation of next sample
-  sample = phase += frequency / samplerate;
-  // wrap the phase to interval [0, 1]
-  if (phase > 1)
-    phase -= 1.0;
-  // calculate sample for the incremented phase
- calculate();
+void Oscillator::tick() {
+    // Example of 2x oversampling
+    float originalFrequency = frequency;
+    float originalSample = sample;
+
+    // Perform the upsampling process
+    for (int i = 0; i < 2; ++i) {
+        sample = phase += (frequency * 2) / samplerate;  // Multiply frequency by oversampling factor
+        if (phase > 1) {
+            phase -= 1.0;
+        }
+        calculate();  // Produce the oversampled wave
+    }
+
+    // Low-pass filter the oversampled wave (simple averaging)
+    sample = (originalSample + sample) / 2.0f;
+
+    // Reset frequency and phase to avoid drifting
+    frequency = originalFrequency;
 }
